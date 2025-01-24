@@ -129,7 +129,7 @@ const DocumentManager = () => {
       <Paper elevation={3} sx={{ padding: 4, marginBottom: 4 }}>
         <Grid container spacing={3}>
         <Grid item xs={12}>
-            <Typography variant="h6">Upload Contract/Rules</Typography>
+            <Typography variant="h6">Upload Document to Analyze</Typography>
             <TextField
               type="file"
               fullWidth
@@ -148,7 +148,7 @@ const DocumentManager = () => {
           </Grid>
           {/* Upload Rule Document */}
           <Grid item xs={12}>
-            <Typography variant="h6">Upload Document to Analyze</Typography>
+            <Typography variant="h6">Upload Contract/Rules</Typography>
             <TextField
               type="file"
               fullWidth
