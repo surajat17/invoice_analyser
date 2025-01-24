@@ -26,7 +26,8 @@ const DocumentManager = () => {
     formData.append("file", file);
 
     try {
-      const response = await axios.post("/upload/", formData, {
+      console.log("hhhh")
+      const response = await axios.post("https://makeathon-vmci.onrender.com/upload/", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -57,7 +58,7 @@ const DocumentManager = () => {
 
     try {
       const response = await axios.get(
-        `/download/report/?document_id=${invoiceId}&rule_id=${ruleId}`,
+        `https://makeathon-vmci.onrender.com/download/report/?document_id=${invoiceId}&rule_id=${ruleId}`,
         { responseType: "blob" }
       );
 
@@ -80,7 +81,7 @@ const DocumentManager = () => {
 
     try {
       const response = await axios.get(
-        `/download/table/?document_id=${invoiceId}`,
+        `https://makeathon-vmci.onrender.com/download/table/?document_id=${invoiceId}`,
         { responseType: "blob" }
       );
 
