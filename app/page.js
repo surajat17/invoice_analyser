@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import React, { useState } from "react";
 import {
   Box,
@@ -8,6 +8,8 @@ import {
   TextField,
   Alert,
   Button,
+  CircularProgress,
+  Backdrop,
 } from "@mui/material";
 import axios from "axios";
 
@@ -18,6 +20,7 @@ const DocumentManager = () => {
     rule: "",
     invoice: "",
   });
+  const [loading, setLoading] = useState(false);
 
   const handleFileUpload = async (file, type) => {
     if (!file) return;
@@ -26,12 +29,16 @@ const DocumentManager = () => {
     formData.append("file", file);
 
     try {
-      console.log("hhhh")
-      const response = await axios.post("https://makeathon-vmci.onrender.com/upload/", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      setLoading(true); // Start loader
+      const response = await axios.post(
+        "https://makeathon-vmci.onrender.com/upload/",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       const { file_id, status } = response.data;
 
@@ -47,16 +54,21 @@ const DocumentManager = () => {
         ...prev,
         [type]: "File upload failed. Please try again.",
       }));
+    } finally {
+      setLoading(false); // Stop loader
     }
   };
 
   const handleDownloadReport = async () => {
     if (!ruleId || !invoiceId) {
-      alert("Please upload both Rule and Invoice documents before downloading the report.");
+      alert(
+        "Please upload both Rule and Invoice documents before downloading the report."
+      );
       return;
     }
 
     try {
+      setLoading(true); // Start loader
       const response = await axios.get(
         `https://makeathon-vmci.onrender.com/download/report/?document_id=${invoiceId}&rule_id=${ruleId}`,
         { responseType: "blob" }
@@ -70,6 +82,8 @@ const DocumentManager = () => {
       link.click();
     } catch (error) {
       console.error("Error downloading the report:", error);
+    } finally {
+      setLoading(false); // Stop loader
     }
   };
 
@@ -80,6 +94,7 @@ const DocumentManager = () => {
     }
 
     try {
+      setLoading(true); // Start loader
       const response = await axios.get(
         `https://makeathon-vmci.onrender.com/download/table/?document_id=${invoiceId}`,
         { responseType: "blob" }
@@ -93,6 +108,8 @@ const DocumentManager = () => {
       link.click();
     } catch (error) {
       console.error("Error downloading the table:", error);
+    } finally {
+      setLoading(false); // Stop loader
     }
   };
 
@@ -106,31 +123,13 @@ const DocumentManager = () => {
       }}
     >
       <Typography variant="h4" align="center" gutterBottom>
-        Document Upload and Report/Table Download
+      Intelligent Invoice Analyzer
       </Typography>
 
       <Paper elevation={3} sx={{ padding: 4, marginBottom: 4 }}>
         <Grid container spacing={3}>
-          {/* Upload Rule Document */}
-          <Grid item xs={12}>
-            <Typography variant="h6">Upload Rule Document</Typography>
-            <TextField
-              type="file"
-              fullWidth
-              InputLabelProps={{ shrink: true }}
-              onChange={(e) => handleFileUpload(e.target.files[0], "rule")}
-            />
-            {uploadStatus.rule && (
-              <Alert severity={ruleId ? "success" : "error"} sx={{ marginTop: 2 }}>
-                {uploadStatus.rule}
-              </Alert>
-            )}
-            {ruleId && <Typography>Rule Document ID: {ruleId}</Typography>}
-          </Grid>
-
-          {/* Upload Invoice Document */}
-          <Grid item xs={12}>
-            <Typography variant="h6">Upload Invoice Document</Typography>
+        <Grid item xs={12}>
+            <Typography variant="h6">Upload Document to Analyze</Typography>
             <TextField
               type="file"
               fullWidth
@@ -145,19 +144,46 @@ const DocumentManager = () => {
                 {uploadStatus.invoice}
               </Alert>
             )}
-            {invoiceId && <Typography>Invoice Document ID: {invoiceId}</Typography>}
+            {invoiceId && <Typography>Document ID: {invoiceId}</Typography>}
           </Grid>
+          {/* Upload Rule Document */}
+          <Grid item xs={12}>
+            <Typography variant="h6">Upload Contract/Rules</Typography>
+            <TextField
+              type="file"
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+              onChange={(e) => handleFileUpload(e.target.files[0], "rule")}
+            />
+            {uploadStatus.rule && (
+              <Alert severity={ruleId ? "success" : "error"} sx={{ marginTop: 2 }}>
+                {uploadStatus.rule}
+              </Alert>
+            )}
+            {ruleId && <Typography>Document ID: {ruleId}</Typography>}
+          </Grid>
+
+          {/* Upload Invoice Document */}
+
         </Grid>
       </Paper>
 
       <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
         <Button variant="contained" color="primary" onClick={handleDownloadReport}>
-          Download Report
+        Download Analysis Report
         </Button>
         <Button variant="contained" color="secondary" onClick={handleDownloadTable}>
-          Download Table
+        Download Table Json
         </Button>
       </Box>
+
+      {/* Loader */}
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={loading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </Box>
   );
 };
